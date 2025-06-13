@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: hrapp
+      POSTGRES_PASSWORD: hrapp
+      POSTGRES_DB: hrapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./api
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__Default=Host=db;Database=hrapp;Username=hrapp;Password=hrapp
+    volumes:
+      - cv-storage:/app/cv-storage
+    ports:
+      - "5000:8080"
+
+  web:
+    build: ./web
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
+  cv-storage:
